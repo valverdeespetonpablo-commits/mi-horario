@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horario Horizontal Móvil</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { font-family: 'Inter', sans-serif; background-color: #1a1a2e; color: #fff; margin:0; padding:0; }
+.fade-in { animation: fadeIn 0.5s ease forwards; opacity: 0; }
+@keyframes fadeIn { to { opacity: 1; } }
+.dia-columna { min-width: 200px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; margin-right: 1rem; }
+.bloque { border-radius: 12px; padding: 0.5rem; box-shadow: 0 3px 6px rgba(0,0,0,0.3); width: 90%; margin-bottom: 0.5rem; display: flex; flex-direction: column; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="p-4">
+<header class="mb-4 text-center">
+<h1 class="text-3xl font-bold mb-1">Mi Horario</h1>
+<p class="text-sm text-zinc-400">Vista horizontal para móvil</p>
+</header>
+
+<div class="flex overflow-x-auto pb-4" id="horario-container">
+<!-- Columnas de días generadas por JS -->
+</div>
+
+<div class="mt-4 text-center text-sm text-zinc-400">
+<p>Abre este archivo en el navegador del móvil y usa "Añadir a pantalla de inicio".</p>
+</div>
+</div>
+
+<script>
+const horario = [
+{dia:"Lunes", nombre:"Teoría de Estructuras", inicio:"15:00", fin:"17:00", aula:"A11", color:"bg-blue-600"},
+{dia:"Lunes", nombre:"Descanso", inicio:"17:00", fin:"17:30", aula:"Cafetería", color:"bg-slate-600"},
+{dia:"Lunes", nombre:"Ingeniería Térmica", inicio:"17:30", fin:"19:30", aula:"A11", color:"bg-violet-600"},
+
+{dia:"Martes", nombre:"Teoría de Máquinas y Mecanismos", inicio:"15:00", fin:"16:00", aula:"A11", color:"bg-emerald-600"},
+{dia:"Martes", nombre:"Teoría de Estructuras", inicio:"16:00", fin:"17:00", aula:"A11", color:"bg-blue-600"},
+{dia:"Martes", nombre:"Descanso", inicio:"17:00", fin:"17:30", aula:"Cafetería", color:"bg-slate-600"},
+{dia:"Martes", nombre:"Ingeniería Térmica", inicio:"17:30", fin:"18:30", aula:"A11", color:"bg-pink-600"},
+{dia:"Martes", nombre:"Ingeniería de Materiales", inicio:"18:30", fin:"19:30", aula:"A11", color:"bg-amber-600"},
+
+{dia:"Miércoles", nombre:"Teoría de Máquinas y Mecanismos", inicio:"15:00", fin:"17:00", aula:"A11", color:"bg-emerald-600"},
+{dia:"Miércoles", nombre:"Descanso", inicio:"17:00", fin:"17:30", aula:"Cafetería", color:"bg-slate-600"},
+{dia:"Miércoles", nombre:"Ingeniería de Materiales", inicio:"17:30", fin:"19:30", aula:"A11", color:"bg-amber-600"},
+
+{dia:"Jueves", nombre:"Diseño de Máquinas 1", inicio:"15:00", fin:"17:00", aula:"A11", color:"bg-cyan-600"},
+{dia:"Jueves", nombre:"Descanso", inicio:"17:00", fin:"17:30", aula:"Cafetería", color:"bg-slate-600"},
+{dia:"Jueves", nombre:"Máquinas Eléctricas", inicio:"17:30", fin:"18:30", aula:"A11", color:"bg-rose-600"},
+{dia:"Jueves", nombre:"Electrónica", inicio:"18:30", fin:"19:30", aula:"A11", color:"bg-teal-600"},
+
+{dia:"Viernes", nombre:"Máquinas Eléctricas", inicio:"15:00", fin:"17:00", aula:"A11", color:"bg-rose-600"},
+{dia:"Viernes", nombre:"Descanso", inicio:"17:00", fin:"17:30", aula:"Cafetería", color:"bg-slate-600"},
+{dia:"Viernes", nombre:"Electrónica", inicio:"17:30", fin:"19:30", aula:"A11", color:"bg-teal-600"}
+];
+
+function horaAMinutos(hora) {
+  const [h,m] = hora.split(":").map(Number);
+  return h*60+m;
+}
+
+function calcularAltura(inicio, fin) {
+  return (horaAMinutos(fin)-horaAMinutos(inicio))*2; // 1 min = 2px
+}
+
+const container=document.getElementById("horario-container");
+const diasUnicos=[...new Set(horario.map(h=>h.dia))];
+
+diasUnicos.forEach(dia=>{
+  const columna=document.createElement("div");
+  columna.className="dia-columna bg-zinc-900 rounded-2xl p-2";
+  
+  const titulo=document.createElement("h2");
+  titulo.className="text-xl font-bold mb-2";
+  titulo.textContent=dia;
+  columna.appendChild(titulo);
+  
+  horario.filter(h=>h.dia===dia).forEach((clase,i)=>{
+    const bloque=document.createElement("div");
+    bloque.className=`bloque ${clase.color} fade-in`;
+    bloque.style.height=calcularAltura(clase.inicio,clase.fin)+"px";
+    bloque.style.animationDelay=`${i*0.1}s`;
+    bloque.innerHTML=`
+      <div class="font-bold">${clase.nombre}</div>
+      <div class="text-xs text-zinc-200">${clase.aula}</div>
+      <div class="text-xs text-zinc-300">${clase.inicio} - ${clase.fin}</div>
+    `;
+    columna.appendChild(bloque);
+  });
+  
+  container.appendChild(columna);
+});
+</script>
+</body>
+</html>
